@@ -39,7 +39,10 @@
           and artistic expression. Today, it thrives with jazz heritage, vibrant art, and strong community spirit.
         </p>
 
-        <button class="book-btn">👉 Book Your Langa Experience</button>
+        <button class="book-btn" @click="$router.push('/single-township')">
+  👉 Book Your Langa Experience
+</button>
+
       </div>
 
       <!-- Image / Map Column -->

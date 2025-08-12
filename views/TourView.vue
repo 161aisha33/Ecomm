@@ -17,19 +17,59 @@
         </div>
         <div class="tour-text">
           <p class="tour-description">{{ tour.description }}</p>
-          <router-link :to="tour.link" class="more-info-link">More Info</router-link>
+          <div class="links">
+            <router-link :to="tour.link" class="button more-info-btn">More Info</router-link>
+            <button @click="showPackages(tour)" class="book-now-btn">Book Now</button>
+          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Packages Modal -->
+    <div v-if="showPackagesModal" class="modal-overlay" @click.self="closePackagesModal">
+      <div class="modal-content">
+        <TourPackages 
+          :selectedTour="selectedTour"
+          @package-selected="showPackageDetails"
+          @close="closePackagesModal"
+        />
+      </div>
+    </div>
+
+    <!-- Package Details Modal -->
+    <div v-if="showPackageDetailsModal" class="modal-overlay" @click.self="closePackageDetailsModal">
+      <div class="modal-content">
+        <component 
+          :is="selectedPackage.component" 
+          :tour="selectedTour"
+        />
+        <button @click="closePackageDetailsModal" class="close-btn">Close</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import TourPackages from '@/components/TourPackages.vue'
+import SingleTownship from './SingleTownship.vue';
+import TownshipDuo from './TownshipDuo.vue';
+import FullCapeCulture from './FullCapeCulture.vue';
+
 export default {
   name: "TourView",
+  components: { 
+    TourPackages,
+    SingleTownship,
+    TownshipDuo,
+    FullCapeCulture
+  },
   data() {
     return {
       hoverTour: null,
+      showPackagesModal: false,
+      showPackageDetailsModal: false,
+      selectedTour: null,
+      selectedPackage: null,
       tours: [
         {
           id: 1,
@@ -39,11 +79,11 @@ export default {
           link: "/tours/bokaap"
         },
         {
-        id: 2,
-        name: "Khayelitsha Township Experience",
-        image: require("../assets/Gemini_Generated_Image_by3o39by3o39by3o.png"),
-        description: "Experience the rhythm and resilience of one of South Africa’s fastest-growing townships. Khayelitsha—meaning “new home” in isiXhosa—is a vibrant urban hub where baristas, barbers, and beatmakers are redefining African city life from the ground up. This is a walking story through hope, hustle, and homegrown culture. ",
-        link: "/tours/khayelitsha"
+          id: 2,
+          name: "Khayelitsha Township Experience",
+          image: require("../assets/Gemini_Generated_Image_by3o39by3o39by3o.png"),
+          description: "Experience the rhythm and resilience of one of South Africa’s fastest-growing townships. Khayelitsha—meaning “new home” in isiXhosa—is a vibrant urban hub where baristas, barbers, and beatmakers are redefining African city life from the ground up. This is a walking story through hope, hustle, and homegrown culture.",
+          link: "/tours/khayelitsha"
         },
         {
           id: 3,
@@ -56,15 +96,30 @@ export default {
           id: 4,
           name: "Mitchells Plain Local Ride",
           image: require("../assets/Gemini_Generated_Image_yjao3jyjao3jyjao.png"),
-          description: "Step into the heart of the Cape Flats, where creativity meets community. Mitchells Plain is alive with rhythm, colour, and flavour—from the sound of local beats to the sizzle of street food stalls. This immersive tour shines a light on a vibrant, often misunderstood community—where adversity has inspired innovation, and every corner has a story to tell. ",
+          description: "Step into the heart of the Cape Flats, where creativity meets community. Mitchells Plain is alive with rhythm, colour, and flavour—from the sound of local beats to the sizzle of street food stalls. This immersive tour shines a light on a vibrant, often misunderstood community—where adversity has inspired innovation, and every corner has a story to tell.",
           link: "/tours/mitchellsplain"
         }
       ]
-    };{
-       hoverTour: null
+    }
+  },
+  methods: {
+    showPackages(tour) {
+      this.selectedTour = tour;
+      this.showPackagesModal = true;
+    },
+    closePackagesModal() {
+      this.showPackagesModal = false;
+    },
+    showPackageDetails(pkg) {
+      this.selectedPackage = pkg;
+      this.showPackagesModal = false;
+      this.showPackageDetailsModal = true;
+    },
+    closePackageDetailsModal() {
+      this.showPackageDetailsModal = false;
     }
   }
-};
+}
 </script>
 
 <style scoped>
@@ -80,23 +135,24 @@ export default {
 }
 
 .tour-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 2rem;
 }
 
 .tour-item {
   display: flex;
-  align-items: flex-start;
-  gap: 2rem;
+  flex-direction: column; /* stack content vertically */
+  gap: 1rem; /* space inside card */
   background-color: #fff;
   border-radius: 10px;
   padding: 1rem;
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  flex-wrap: wrap;
-  position: relative; /* Added for background positioning */
-  overflow: hidden; /* Added to contain the background */
+  position: relative;
+  overflow: hidden;
   transition: all 0.3s ease;
+  width: 100%;
+  height: 100%;
 }
 
 .tour-item::before {
@@ -106,7 +162,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("https://i.pinimg.com/1200x/da/0d/06/da0d060d7d971da15b42b31453c44e0c.jpg");
+  background-color: rgb(245, 243, 243);
   background-size: cover;
   background-position: center;
   opacity: 0;
@@ -128,14 +184,12 @@ export default {
 .tour-text {
   position: relative;
   z-index: 1;
-  /* background-color: rgba(255,255,255,0.8); */
-   /* Slightly transparent white */
 }
 
 .image-container {
   display: flex;
   flex-direction: column;
-  width: 300px;
+  width: 100%;
 }
 
 .tour-image {
@@ -147,9 +201,12 @@ export default {
 }
 
 .tour-text {
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 250px;
-  margin-top: 9rem;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .tour-title {
@@ -162,18 +219,57 @@ export default {
   font-size: 1rem;
   margin-bottom: 1rem;
 }
-
-.more-info-link {
-  color: #091d35;
-  text-decoration: underline;
-  font-weight: bold;
-  margin-top: 6rem;
+.links {
+  display: flex;
+  gap: 1rem;
+  margin-top: auto;  /* Push links to bottom of .tour-text */
+  justify-content: center; /* Center horizontally, adjust as needed */
+  flex-wrap: wrap; /* In case of very narrow widths */
 }
 
-.more-info-link:hover {
-  color: rgb(246, 196, 109);
-  transition: color 0.3s ease;
+
+.button {
+  background-color: white;
+  border: 2px solid #f6c46d;
+  border-radius: 5px;
+  color: #091d35;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
   cursor: pointer;
+  text-align: center;
+  display: inline-block;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  text-decoration: none; /* remove underline */
+}
+
+.button:hover {
+  background-color: #f6c46d;
+  color: #091d35;
+  border-color: #d4a44a;
+}
+
+
+.book-now-btn {
+  background-color: white;
+  border: 2px solid #f6c46d;
+  border-radius: 5px;
+  color: #091d35;
+  font-weight: bold;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.book-now-btn:hover {
+  background-color: #f6c46d;
+  color: #091d35;
+  border-color: #d4a44a;
+}
+.button,
+.book-now-btn {
+  /* flex: 1 1 auto;  */
+  min-width: 100px; /* Optional: prevent too narrow buttons */
+  text-align: center;
 }
 
 @media (max-width: 768px) {
@@ -184,5 +280,45 @@ export default {
   .image-container {
     width: 100%;
   }
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  max-width: 800px;
+  width: 90%;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  text-align: center;
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+.close-btn {
+  margin-top: 2rem;
+  background-color: #d9534f;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.close-btn:hover {
+  background-color: #c9302c;
 }
 </style>

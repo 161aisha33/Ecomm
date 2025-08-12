@@ -48,7 +48,7 @@
           the flavours that fuel the streets.
         </p>
 
-        <button class="book-btn">👉 Book your Cape Flats experience now</button>
+        <button class="book-btn"@click="$router.push('/single-township')">👉 Book your Cape Flats experience now</button>
       </div>
 
       <!-- Image / Media Column -->
@@ -83,7 +83,7 @@ export default {
 <style scoped>
 .hero {
   position: relative;
-  background: url('https://i.pinimg.com/originals/26/b4/96/26b49651114a27c52a598cd8d15c03bc.gif') center/cover no-repeat;
+  background: url("../assets/Video by Toma Gerzha.jpg")center/cover no-repeat;
   height: 60vh;
   display: flex;
   align-items: center;
@@ -108,7 +108,9 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(8, 8, 8, 0.4);
+  
+  
   /* Removed overlay animation to keep it simple */
 }
 
@@ -153,6 +155,8 @@ export default {
   border-radius: 12px;
   box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
 }
+
+
 .tour-media img.third-image {
   height: 280px;
   object-fit: cover;
@@ -186,6 +190,7 @@ export default {
   object-fit: cover;
   border-radius: 12px;
 }
+
 
 .tour-media .second-image {
   height: 350px;

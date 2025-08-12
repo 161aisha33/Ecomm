@@ -68,7 +68,9 @@ export default {
       currentIndex: 0,
       images: [
         'https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=auto,quality=60,width=450,height=450,dpr=2/tour_img/b25eee60c655631ccbc96c51128556e88b9b04a105e1e7fc722c093a33b72589.jpeg',
-        'https://capetowndiva.com/wp-content/uploads/2019/06/tomazile-mpanu-stands-at-his-winning-ultra-2019-mural-on-bitterhout-street--1024x611.jpeg'
+        "https://widevisiontravel.com/wp-content/uploads/fimg-cape-town-ships-tours-jpeg.webp",
+        'https://capetowndiva.com/wp-content/uploads/2019/06/tomazile-mpanu-stands-at-his-winning-ultra-2019-mural-on-bitterhout-street--1024x611.jpeg',
+        'https://landlopers.com/wp-content/uploads/2014/08/Kayamandi-Township-Stellenbosch-South-Africa.jpg'
       ],
      communities: [
   {
