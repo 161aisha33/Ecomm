@@ -12,7 +12,7 @@
     <!-- Tour Info Two-Column -->
     <section class="tour-info">
       <div class="tour-card">
-        <h2>About This Tour</h2>
+        <h2>About This Tour</h2><br><br>
         <p>
           Step into the heart of the Cape Flats, where creativity meets community. Mitchells Plain is alive with rhythm, colour, and flavour—from the sound 
           of local beats to the sizzle of street food stalls. 
@@ -20,7 +20,7 @@
           story to tell.
         </p>
 
-        <h3>✨ What’s Included</h3>
+        <h3>✨ What’s Included</h3><br>
         <ul>
           <li>🍴 Street food tasting – try the legendary Gatsby & vetkoek</li>
           <li>🎨 Mural walk – guided by a local township artist</li>
@@ -34,7 +34,7 @@
         <p><strong>💰 Price:</strong> R1500 per person</p>
         <p><strong>🎁 Includes all tastings, transport, guide, and souvenir</strong></p>
 
-        <h3>📍 About Mitchells Plain</h3>
+        <h3>📍 About Mitchells Plain</h3><br>
         <p>
           Mitchells Plain was created in the 1970s under the apartheid regime, built as a township for Coloured South Africans forcibly removed from 
           inner-city communities like District Six. 
@@ -42,13 +42,13 @@
           powerful community spirit, dynamic street art, and youth-led innovation.
         </p>
 
-        <h3>🌟 Why This Tour?</h3>
+        <h3>🌟 Why This Tour?</h3><br>
         <p>
           This is more than a visit—it’s an invitation into real, everyday life on the Cape Flats. You’ll experience local pride, hear untold stories, and taste 
           the flavours that fuel the streets.
         </p>
 
-        <button class="book-btn">👉 Book your Cape Flats experience now</button>
+        <button class="book-btn"@click="$router.push('/single-township')">👉 Book your Cape Flats experience now</button>
       </div>
 
       <!-- Image / Media Column -->
@@ -83,7 +83,7 @@ export default {
 <style scoped>
 .hero {
   position: relative;
-  background: url('https://i.pinimg.com/originals/26/b4/96/26b49651114a27c52a598cd8d15c03bc.gif') center/cover no-repeat;
+  background: url("../assets/Video by Toma Gerzha.jpg")center/cover no-repeat;
   height: 60vh;
   display: flex;
   align-items: center;
@@ -108,7 +108,9 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(8, 8, 8, 0.4);
+  
+  
   /* Removed overlay animation to keep it simple */
 }
 
@@ -153,8 +155,10 @@ export default {
   border-radius: 12px;
   box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
 }
+
+
 .tour-media img.third-image {
-  height: 400px;
+  height: 280px;
   object-fit: cover;
 }
 .tour-card h2,
@@ -186,6 +190,7 @@ export default {
   object-fit: cover;
   border-radius: 12px;
 }
+
 
 .tour-media .second-image {
   height: 350px;

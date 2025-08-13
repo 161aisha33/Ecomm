@@ -12,14 +12,14 @@
     <!-- Tour Info Two-Column -->
     <section class="tour-info">
       <div class="tour-card">
-        <h2>About This Tour</h2>
+        <h2>About This Tour</h2><br><br>
         <p>
           Experience the rhythm and resilience of one of South Africa’s fastest-growing townships. Khayelitsha—meaning “new home” in 
           isiXhosa—is a vibrant urban hub where baristas, barbers, and beatmakers are redefining African city life from the ground up. 
           This is a walking story through hope, hustle, and homegrown culture.
         </p>
-
-        <h3>✨ What’s Included</h3>
+<br>
+        <h3>✨ What’s Included</h3><br>
         <ul>
           <li>☕ Coffee tasting at a buzzing container café</li>
           <li>🧩 Guided story walk through Site C & Makhaza</li>
@@ -33,7 +33,7 @@
         <p><strong>💰 Price:</strong> R1500 per person</p>
         <p><strong>🎁 Includes transport, lunch, and all experiences</strong></p>
 
-        <h3>📍 About Khayelitsha</h3>
+        <h3>📍 About Khayelitsha</h3><br>
         <p>
           Khayelitsha was founded in the early 1980s under apartheid as a residential area for Black South Africans forcibly removed 
           from central Cape Town. Today, it is home to over 400,000 people, spanning formal suburbs like Kuyasa, Litha Park, and 
@@ -42,13 +42,13 @@
           Organizations like the Social Justice Coalition work tirelessly for safety, sanitation, and social change.
         </p>
 
-        <h3>🌟 Why This Tour?</h3>
+        <h3>🌟 Why This Tour?</h3><br>
         <p>
           This isn’t just a township tour—it’s an eye-opening cultural exchange. You’ll walk the streets with locals, share stories over food 
           and music, and witness firsthand how creativity and resilience fuel Khayelitsha’s future.
         </p>
 
-        <button class="book-btn">👉 Book your Khayelitsha experience now</button>
+       <button class="book-btn"@click="$router.push('/single-township')">👉 Book your Khayelitsha experience now</button>
       </div>
 
       <!-- Image / Media Column -->

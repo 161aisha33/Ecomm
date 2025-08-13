@@ -12,12 +12,13 @@
     <!-- Tour Info Two-Column -->
     <section class="tour-info">
       <div class="tour-card">
-        <h2>About This Tour</h2>
+        <h2>About This Tour</h2><br><br>
         <p>
           Wander the cobbled streets of Bo-Kaap, where every corner tells a story. From pastel-painted homes and the melodic call to
           prayer, to the aroma of slow-cooked curries—this experience is a feast for the senses.
           Join us for a journey that blends history, heritage, and hospitality in Cape Town’s most iconic neighborhood.
         </p>
+        <br>
 
         <h3>🌍 What’s Included</h3>
         <ul>
@@ -42,13 +43,13 @@
           stands, with the area preserved as a heritage zone.
         </p>
 
-        <h3>🌟 Why This Tour?</h3>
+        <h3>🌟 Why This Tour?</h3><br>
         <p>
           This isn't just a sightseeing trip—it’s a personal encounter with the soul of Cape Town. Cook in a family home, hear lived
           histories, and leave with a deeper understanding of a vibrant culture that continues to shape South Africa.
         </p>
 
-        <button class="book-btn">👉 Ready to taste the history?</button>
+        <button class="book-btn"@click="$router.push('/single-township')">👉 Ready to taste the history?</button>
       </div>
 
       <!-- Image / Media Column -->

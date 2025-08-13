@@ -36,7 +36,7 @@
 .nav-links {
   display: flex;
   gap: 30px;
-  margin-right: 10vw; /* This creates that semi-centered, semi-right look */
+  margin-right: 10vw; 
 }
 
 .nav-links a {

@@ -2,9 +2,9 @@
   <footer class="footer">
     <div class="footer-content">
       <h3>Contact Us</h3>
-      <p>Email: info@mzansirides.co.za</p>
-      <p>Instagram: @mzansirides</p>
-      <p>Facebook: Mzansi Rides</p>
+      <p>Email: info@caperoutetours.co.za</p>
+      <p>Instagram: @caperoutetours</p>
+      <p>Facebook: Cape Route Tours</p>
     </div>
   </footer>
 </template>

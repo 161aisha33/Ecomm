@@ -1,4 +1,4 @@
-# ecom
+# stripe-payment
 
 ## Project setup
 ```

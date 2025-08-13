@@ -12,14 +12,14 @@
     <!-- Tour Info Two-Column -->
     <section class="tour-info">
       <div class="tour-card">
-        <h2>About This Tour</h2>
+        <h2>About This Tour</h2><br>
         <p>
           Step into Cape Town’s oldest township—where jazz, resistance, and resilience flow through the streets. 
           Langa, meaning “sun”, carries a legacy that shines through every mural, melody, and memory. 
           This is a soulful journey through history, art, and culture—told by those who live it every day.
         </p>
 
-        <h3>✨ What’s Included</h3>
+        <h3>✨ What’s Included</h3><br>
         <ul>
           <li>🎷 Visit to Guga S’thebe Cultural Centre – Langa’s creative heart</li>
           <li>🎨 Live mural art demo by a local street artist</li>
@@ -32,14 +32,17 @@
         <p><strong>🕒 Duration:</strong> 5 Hours</p>
         <p><strong>💰 Price:</strong> R1500 per person</p>
 
-        <h3>📍 History of Langa</h3>
+        <h3>📍 History of Langa</h3><br>
         <p>
           Langa was officially established in 1927 under the Urban Areas Act, part of apartheid’s early system of racial segregation. 
           Named after Langalibalele—a revered Xhosa chief imprisoned on Robben Island—it quickly became a hub of political resistance 
           and artistic expression. Today, it thrives with jazz heritage, vibrant art, and strong community spirit.
         </p>
 
-        <button class="book-btn">👉 Book Your Langa Experience</button>
+        <button class="book-btn" @click="$router.push('/single-township')">
+  👉 Book Your Langa Experience
+</button>
+
       </div>
 
       <!-- Image / Map Column -->
@@ -146,13 +149,13 @@ export default {
 
 .tour-media img {
   width: 100%;
-  height: 350px; /* fixed height for consistency */
+  height: 250px; /* fixed height for consistency */
   object-fit: cover;
   border-radius: 12px;
 }
 
 .tour-media .second-image {
-  height: 350px; /* slightly smaller or same as above */
+  height: 250px; /* slightly smaller or same as above */
 }
 
 .book-btn {
