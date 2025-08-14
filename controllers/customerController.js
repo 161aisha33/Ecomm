@@ -18,3 +18,4 @@ export const updateCustomer = (req, res) => {
 export const deleteCustomer = (req, res) => {
   res.send(`Delete customer with ID ${req.params.id}`);
 };
+

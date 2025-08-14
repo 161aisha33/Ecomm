@@ -48,8 +48,13 @@
           and music, and witness firsthand how creativity and resilience fuel Khayelitsha’s future.
         </p>
 
-        <button class="book-btn">👉 Book your Khayelitsha experience now</button>
-      </div>
+<!-- In MitchellsplainTourDetails.vue -->
+<button 
+  class="book-btn"
+  @click="bookKhayelitsha"
+>
+  👉 Book your Khayelitsha experience now
+</button>      </div>
 
       <!-- Image / Media Column -->
       <div class="tour-media">
@@ -77,7 +82,14 @@ export default {
   name: "KhayelitshaTourDetails",
   mounted() {
     this.$refs.topAnchor.scrollIntoView()
+  },methods: {
+  bookKhayelitsha() {
+    this.$router.push({
+      path: '/single-township',
+      query: { presetTownship: 'Khayelitsha' }
+    });
   }
+}
 }
 </script>
 

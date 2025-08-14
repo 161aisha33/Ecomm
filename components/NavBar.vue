@@ -1,11 +1,13 @@
 <template>
   <nav class="navbar">
     <div class="logo-container">
-      <img
-        src="@/assets/logo.jpg"
-        alt="Cape Route Tours Logo"
-        class="nav-logo"
-      />
+      <router-link to="/">
+        <img
+          src="@/assets/logo.jpg"
+          alt="Cape Route Tours Logo"
+          class="nav-logo"
+        />
+      </router-link>
     </div>
     <div class="nav-links">
       <router-link to="/">Home</router-link>
@@ -51,7 +53,8 @@
   color: rgb(246, 196, 109);
 }
 
+/* Optional: Add hover effect for the logo */
+.logo-container a:hover {
+  opacity: 0.8;
+}
 </style>
-
-
-

@@ -48,8 +48,12 @@
           This isn't just a sightseeing trip—it’s a personal encounter with the soul of Cape Town. Cook in a family home, hear lived
           histories, and leave with a deeper understanding of a vibrant culture that continues to shape South Africa.
         </p>
-
-        <button class="book-btn">👉 Ready to taste the history?</button>
+<button 
+  class="book-btn"
+  @click="bookBokaap"
+>
+  👉 Ready to taste the history?
+</button>
       </div>
 
       <!-- Image / Media Column -->
@@ -78,7 +82,15 @@ export default {
   name: "BokaapTourDetails",
   mounted() {
     this.$refs.topAnchor.scrollIntoView()
+  },
+  methods: {
+  bookBokaap() {
+    this.$router.push({
+      path: '/single-township',
+      query: { presetTownship: 'Bo-Kaap' }
+    });
   }
+}
 }
 </script>
 

@@ -6,6 +6,10 @@ export default (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
+    tourDate: {
+  type: DataTypes.DATE,
+  allowNull: true // Or false if required
+},
     customerId: DataTypes.INTEGER,
     townId: DataTypes.INTEGER,
     packageId: DataTypes.INTEGER,

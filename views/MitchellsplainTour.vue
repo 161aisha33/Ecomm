@@ -48,7 +48,13 @@
           the flavours that fuel the streets.
         </p>
 
-        <button class="book-btn"@click="$router.push('/single-township')">👉 Book your Cape Flats experience now</button>
+ 
+<button 
+  class="book-btn"
+  @click="bookMitchellsPlain"
+>
+  👉 Book your Cape Flats experience now
+</button>
       </div>
 
       <!-- Image / Media Column -->
@@ -77,7 +83,15 @@ export default {
   name: "MitchellsplainTourDetails",
   mounted() {
     this.$refs.topAnchor.scrollIntoView()
+  },
+  methods: {
+  bookMitchellsPlain() {
+    this.$router.push({
+      path: '/single-township',
+      query: { presetTownship: 'Mitchells Plain' }
+    });
   }
+}
 }
 </script>
 <style scoped>

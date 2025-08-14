@@ -7,53 +7,53 @@
         v-for="tour in tours" 
         :key="tour.id" 
         class="tour-item"
-        @mouseenter="hoverTour = tour.id" 
-        @mouseleave="hoverTour = null"
-        :class="{'active-tour': hoverTour === tour.id}"
+        @click="goToTour(tour.link)"
       >
         <div class="image-container">
           <img :src="tour.image" :alt="tour.name" class="tour-image" />
-          <h2 class="tour-title">{{ tour.name }}</h2>
         </div>
-        <div class="tour-text">
-          <p class="tour-description">{{ tour.description }}</p>
-          <div class="links">
-            <router-link :to="tour.link" class="button more-info-btn">More Info</router-link>
-            <button @click="showPackages(tour)" class="book-now-btn">Book Now</button>
-          </div>
-        </div>
+        <h2 class="tour-title">{{ tour.name }}</h2>
+        <button @click.stop="showPackages(tour)" class="book-now-btn">
+          Book Now
+        </button>
       </div>
     </div>
 
-    <!-- Packages Modal -->
+  <!-- Packages Modal -->
     <div v-if="showPackagesModal" class="modal-overlay" @click.self="closePackagesModal">
       <div class="modal-content">
-        <TourPackages 
-          :selectedTour="selectedTour"
-          @package-selected="showPackageDetails"
-          @close="closePackagesModal"
-        />
+        <div class="modal-image-side" :style="{ backgroundImage: `url(${selectedTour.image})` }"></div>
+        <div class="modal-text-side">
+          <TourPackages 
+            :selectedTour="selectedTour"
+            @package-selected="showPackageDetails"
+            @close="closePackagesModal"
+          />
+        </div>
       </div>
     </div>
 
     <!-- Package Details Modal -->
     <div v-if="showPackageDetailsModal" class="modal-overlay" @click.self="closePackageDetailsModal">
-      <div class="modal-content">
-        <component 
-          :is="selectedPackage.component" 
-          :tour="selectedTour"
-        />
-        <button @click="closePackageDetailsModal" class="close-btn">Close</button>
+      <div class="modal-content package-details-modal">
+        <button @click="closePackageDetailsModal" class="close-modal-btn">&times;</button>
+        <div class="scrollable-content">
+          <component :is="selectedPackage.component" :tour="selectedTour" />
+        </div>
+        <button @click="closePackageDetailsModal" class="action-btn">
+          Close Details
+        </button>
       </div>
     </div>
   </div>
 </template>
 
+
 <script>
 import TourPackages from '@/components/TourPackages.vue'
-import SingleTownship from './SingleTownship.vue';
-import TownshipDuo from './TownshipDuo.vue';
-import FullCapeCulture from './FullCapeCulture.vue';
+import SingleTownship from './SingleTownship.vue'
+import TownshipDuo from './TownshipDuo.vue'
+import FullCapeCulture from './FullCapeCulture.vue'
 
 export default {
   name: "TourView",
@@ -65,7 +65,6 @@ export default {
   },
   data() {
     return {
-      hoverTour: null,
       showPackagesModal: false,
       showPackageDetailsModal: false,
       selectedTour: null,
@@ -75,48 +74,47 @@ export default {
           id: 1,
           name: "Bo-Kaap Cultural Walk",
           image: require("../assets/Gemini_Generated_Image_ubnle2ubnle2ubnl.png"),
-          description: "Wander the cobbled streets of Bo-Kaap, where every corner tells a story. From pastel-painted homes and the melodic call to prayer, to the aroma of slow-cooked curries—this experience is a feast for the senses. Join us for a journey that blends history, heritage, and hospitality in Cape Town's most",
           link: "/tours/bokaap"
         },
         {
           id: 2,
           name: "Khayelitsha Township Experience",
           image: require("../assets/Gemini_Generated_Image_by3o39by3o39by3o.png"),
-          description: "Experience the rhythm and resilience of one of South Africa’s fastest-growing townships. Khayelitsha—meaning “new home” in isiXhosa—is a vibrant urban hub where baristas, barbers, and beatmakers are redefining African city life from the ground up. This is a walking story through hope, hustle, and homegrown culture.",
           link: "/tours/khayelitsha"
         },
         {
           id: 3,
           name: "Langa Street Tour",
           image: require("../assets/Gemini_Generated_Image_nlxsjqnlxsjqnlxs.png"),
-          description: "Step into Cape Town’s oldest township—where jazz, resistance, and resilience flow through the streets. Langa, meaning “sun”, carries a legacy that shines through every mural, melody, and memory. This is a soulful journey through history, art, and culture—told by those who live it every day.",
           link: "/tours/langa"
         },
         {
           id: 4,
           name: "Mitchells Plain Local Ride",
           image: require("../assets/Gemini_Generated_Image_yjao3jyjao3jyjao.png"),
-          description: "Step into the heart of the Cape Flats, where creativity meets community. Mitchells Plain is alive with rhythm, colour, and flavour—from the sound of local beats to the sizzle of street food stalls. This immersive tour shines a light on a vibrant, often misunderstood community—where adversity has inspired innovation, and every corner has a story to tell.",
           link: "/tours/mitchellsplain"
         }
       ]
     }
   },
   methods: {
+    goToTour(link) {
+      this.$router.push(link)
+    },
     showPackages(tour) {
-      this.selectedTour = tour;
-      this.showPackagesModal = true;
+      this.selectedTour = tour
+      this.showPackagesModal = true
     },
     closePackagesModal() {
-      this.showPackagesModal = false;
+      this.showPackagesModal = false
     },
     showPackageDetails(pkg) {
-      this.selectedPackage = pkg;
-      this.showPackagesModal = false;
-      this.showPackageDetailsModal = true;
+      this.selectedPackage = pkg
+      this.showPackagesModal = false
+      this.showPackageDetailsModal = true
     },
     closePackageDetailsModal() {
-      this.showPackageDetailsModal = false;
+      this.showPackageDetailsModal = false
     }
   }
 }
@@ -124,130 +122,97 @@ export default {
 
 <style scoped>
 .tour-page {
-  padding: 2rem;
-  margin-left: 2rem; 
+  background: url('https://transparenttextures.com/patterns/cream-paper.png'), #fff;
+  padding: 3rem 2rem;
+  min-height: 100vh;
 }
 
 .page-title {
   text-align: center;
   font-size: 2rem;
   margin-bottom: 2rem;
+  color: #091d35;
+  font-weight: bold;
+  display: inline-block;
+  border: 2px solid #f6c46d;
+  padding: 0.6rem 1.5rem;
+  border-radius: 5px;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(246, 196, 109, 0.3);
 }
 
 .tour-list {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 2rem;
 }
 
 .tour-item {
   display: flex;
-  flex-direction: column; /* stack content vertically */
-  gap: 1rem; /* space inside card */
+  flex-direction: column;
   background-color: #fff;
   border-radius: 10px;
-  padding: 1rem;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-  position: relative;
   overflow: hidden;
-  transition: all 0.3s ease;
-  width: 100%;
-  height: 100%;
-}
-
-.tour-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgb(245, 243, 243);
-  background-size: cover;
-  background-position: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 0;
-}
-
-.tour-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
-}
-
-.tour-item:hover::before {
-  opacity: 0.3; /* Adjust this value for desired transparency */
-}
-
-/* Ensure content stays above background */
-.image-container,
-.tour-text {
+  box-shadow: 0 5px 15px rgba(9, 29, 53, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  text-align: center;
   position: relative;
-  z-index: 1;
+  height: 100%;
 }
 
 .image-container {
-  display: flex;
-  flex-direction: column;
+  position: relative;
   width: 100%;
+  overflow: hidden;
 }
 
 .tour-image {
   width: 100%;
-  height: auto;
-  border-radius: 10px;
+  height: 280px;
   object-fit: cover;
-  margin-bottom: 0.5rem;
+  transition: transform 0.9s ease;
 }
 
-.tour-text {
-  flex: 1 1 auto;
-  min-width: 250px;
-  margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.image-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.6));
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
 .tour-title {
   font-size: 1.5rem;
-  margin-top: 0.5rem;
-  text-align: center;
-}
-
-.tour-description {
-  font-size: 1rem;
-  margin-bottom: 1rem;
-}
-.links {
-  display: flex;
-  gap: 1rem;
-  margin-top: auto;  /* Push links to bottom of .tour-text */
-  justify-content: center; /* Center horizontally, adjust as needed */
-  flex-wrap: wrap; /* In case of very narrow widths */
-}
-
-
-.button {
-  background-color: white;
-  border: 2px solid #f6c46d;
-  border-radius: 5px;
-  color: #091d35;
   font-weight: bold;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  text-align: center;
-  display: inline-block;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  text-decoration: none; /* remove underline */
+  z-index: 2;
+  position: relative;
+  transition: transform 0.3s ease, color 0.3s ease;
+  margin: 1rem 0;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.button:hover {
-  background-color: #f6c46d;
-  color: #091d35;
-  border-color: #d4a44a;
+.tour-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(9, 29, 53, 0.15);
 }
 
+.tour-item:hover .tour-image {
+  transform: scale(1.1);
+}
+
+.tour-item:hover .image-container::after {
+  opacity: 1;
+}
+
+.tour-item:hover .tour-title {
+  transform: scale(1.05);
+  color:#091d35
+}
 
 .book-now-btn {
   background-color: white;
@@ -255,9 +220,15 @@ export default {
   border-radius: 5px;
   color: #091d35;
   font-weight: bold;
-  padding: 0.6rem 1rem;
+  padding: 0.8rem 1.5rem;
+  width: 140px;
+  text-align: center;
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
+  position: relative;
+  z-index: 2;
+  margin-bottom: 1rem;
+  align-self: center;
 }
 
 .book-now-btn:hover {
@@ -265,60 +236,146 @@ export default {
   color: #091d35;
   border-color: #d4a44a;
 }
-.button,
-.book-now-btn {
-  /* flex: 1 1 auto;  */
-  min-width: 100px; /* Optional: prevent too narrow buttons */
-  text-align: center;
-}
 
-@media (max-width: 768px) {
-  .tour-item {
-    flex-direction: column;
-  }
-  
-  .image-container {
-    width: 100%;
-  }
-}
-
+/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0,0,0,0.6);
+  background-color: rgba(9, 29, 53, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
+  backdrop-filter: blur(3px);
 }
 
 .modal-content {
-  background: white;
-  border-radius: 10px;
-  padding: 2rem;
-  max-width: 800px;
+  background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 15px;
+  padding: 0;
+  max-width: 900px;
   width: 90%;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  overflow: hidden;
+  max-height: 90vh;
+  display: grid;
+  grid-template-columns: 40% 60%;
+  position: relative;
+}
+
+.modal-image-side {
+  background-size: cover;
+  background-position: center;
+  min-height: 300px;
+}
+
+.modal-text-side {
   overflow-y: auto;
-  max-height: 80vh;
+  padding: 2rem;
+  max-height: calc(90vh - 4rem); /* Adjust based on your needs */
 }
 
-.close-btn {
-  margin-top: 2rem;
-  background-color: #d9534f;
-  color: white;
+.package-details-modal {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  width: 90%;
+  max-width: 900px;
+}
+
+.close-modal-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
   border: none;
-  padding: 0.5rem 1.5rem;
-  border-radius: 5px;
+  color: #091d35;
+  font-size: 1.8rem;
   cursor: pointer;
-  font-weight: bold;
+  transition: all 0.3s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
-.close-btn:hover {
-  background-color: #c9302c;
+.close-modal-btn:hover {
+  background-color: rgba(9, 29, 53, 0.1);
+  color: #d9534f;
+}
+
+.action-btn {
+  margin: 1rem auto 2rem;
+  padding: 0.8rem 2rem;
+}
+
+.action-btn:hover {
+  background-color: #e4b34a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(246, 196, 109, 0.3);
+}
+
+/* Decorative elements */
+.modal-content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 40%;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent 0%, rgba(246, 196, 109, 0.3) 50%, transparent 100%);
+}
+
+.modal-content::after {
+  content: "";
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23f6c46d"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>');
+  opacity: 0.1;
+  z-index: 0;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-image-side {
+    height: 200px;
+  }
+  
+  .modal-content::before {
+    display: none;
+  }
+  
+  .tour-list {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+/* Update package cards container */
+.package-cards-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.package-cards {
+  overflow-y: visible;
+  padding-right: 0;
+  margin-bottom: 1rem;
+  
+}
+.scrollable-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+  max-height: calc(80vh - 100px); /* Space for header and button */
 }
 </style>

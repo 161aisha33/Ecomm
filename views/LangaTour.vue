@@ -39,7 +39,11 @@
           and artistic expression. Today, it thrives with jazz heritage, vibrant art, and strong community spirit.
         </p>
 
-        <button class="book-btn" @click="$router.push('/single-township')">
+     <!-- In MitchellsplainTourDetails.vue -->
+<button 
+  class="book-btn"
+  @click="bookLanga"
+>
   👉 Book Your Langa Experience
 </button>
 
@@ -68,7 +72,14 @@ export default {
   name: "LangaTourDetails",
   mounted() {
     this.$refs.topAnchor.scrollIntoView()
+  },methods: {
+  bookLanga() {
+    this.$router.push({
+      path: '/single-township',
+      query: { presetTownship: 'Langa' }
+    });
   }
+}
 }
 </script>
 <style scoped>
