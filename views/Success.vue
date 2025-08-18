@@ -15,46 +15,96 @@
           <div class="confetti" v-for="(c, i) in 50" :key="i" :style="confettiStyle(i)"></div>
         </div>
 
-        <div class="booking-details">
-       <div class="detail-section">
-    <h3 class="section-title">Tour Information</h3>
-    <div class="detail-item">
-      <span class="detail-label">Tour Package:</span>
-      <span class="detail-value">{{ booking.Package.packageName }}</span>
+   <div class="booking-details">
+    <div class="detail-section">
+      <h3 class="section-title">Tour Information</h3>
+      <div class="detail-item">
+        <span class="detail-label">Tour Package:</span>
+        <span class="detail-value">{{ booking.packageName }}</span>
+      </div>
+      
+      <!-- Dynamic display based on package type -->
+      <template v-if="isSingleTownship">
+        <div class="detail-item">
+          <span class="detail-label">Township:</span>
+          <span class="detail-value">{{ booking.tours[0].township || booking.tours[0].name }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Tour Date:</span>
+          <span class="detail-value">{{ formatDate(booking.tours[0].date) }}</span>
+        </div>
+      </template>
+      
+      <template v-else-if="isTownshipDuo">
+        <div v-for="(tour, index) in booking.tours" :key="index" class="tour-item">
+          <div class="detail-item">
+            <span class="detail-label">Township {{ index + 1 }}:</span>
+            <span class="detail-value">{{ tour.township || tour.name }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Tour Date {{ index + 1 }}:</span>
+            <span class="detail-value">{{ formatDate(tour.date) }}</span>
+          </div>
+        </div>
+      </template>
+      
+      <template v-else-if="isFullCapeCulture">
+        <div v-for="(tour, index) in normalizedTours" :key="index" class="tour-item">
+          <div class="detail-item">
+            <span class="detail-label">Township {{ index + 1 }}:</span>
+            <span class="detail-value">{{ tour.township || tour.name }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Tour Date {{ index + 1 }}:</span>
+            <span class="detail-value">{{ formatDate(tour.date) }}</span>
+          </div>
+        </div>
+      </template>
+      
+      <div class="detail-item">
+        <span class="detail-label">Number of People:</span>
+        <span class="detail-value">{{ booking.people }}</span>
+      </div>
     </div>
-    <div class="detail-item">
-      <span class="detail-label">Tour Date:</span>
-      <span class="detail-value">{{ formatDate(booking.tourDate) }}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Selected Township:</span>
-      <span class="detail-value">{{ booking.Township.townName }}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Number of People:</span>
-      <span class="detail-value">{{ booking.numberOfPeople }}</span>
-    </div>
-  </div>
 
-  <div class="detail-section">
-    <h3 class="section-title">Tour Logistics</h3>
-    <div class="detail-item">
-      <span class="detail-label">Date & Time:</span>
-      <span class="detail-value">{{ formatDateTime(booking.tourDate) }}</span>
+    <div class="detail-section">
+      <h3 class="section-title">Tour Logistics</h3>
+      
+      <template v-if="isSingleTownship">
+        <div class="detail-item">
+          <span class="detail-label">Date & Time:</span>
+          <span class="detail-value">{{ formatDateTime(booking.tours[0].date) }}</span>
+        </div>
+      </template>
+      
+      <template v-else-if="isTownshipDuo">
+        <div v-for="(tour, index) in booking.tours" :key="'log-'+index" class="detail-item">
+          <span class="detail-label">Date & Time ({{ index + 1 }}):</span>
+          <span class="detail-value">{{ formatDateTime(tour.date) }}</span>
+        </div>
+      </template>
+      
+      <template v-else-if="isFullCapeCulture">
+        <div v-for="(tour, index) in normalizedTours" :key="'log-'+index" class="detail-item">
+          <span class="detail-label">Date & Time ({{ index + 1 }}):</span>
+          <span class="detail-value">{{ formatDateTime(tour.date) }}</span>
+        </div>
+      </template>
+      
+      <div class="detail-item">
+        <span class="detail-label">Meeting Point:</span>
+        <span class="detail-value">Cape of Good Hope (Central Pick-Up Point)</span>
+      </div>
     </div>
-    <div class="detail-item">
-      <span class="detail-label">Meeting Point:</span>
-      <span class="detail-value">Cape of Good Hope (Central Pick-Up Point)</span>
-    </div>
-  </div>
+
           <div class="detail-section total-section">
             <div class="detail-item">
               <span class="detail-label">Total Amount:</span>
-              <span class="detail-value total-amount">R{{ booking.totalPrice }}</span>
+              <span class="detail-value total-amount">R{{ booking.total }}</span>
             </div>
             <div class="detail-item">
               <span class="detail-label">Booking Reference:</span>
-              <span class="detail-value ref-number">#{{ booking.bookingId }}</span>
+              <span class="detail-value ref-number">#{{ booking.bookingRef }}</span>
             </div>
           </div>
         </div>
@@ -109,13 +159,45 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const loading = ref(true);
 const booking = ref(null);
 const error = ref(null);
+
+// Computed properties to determine package type
+const normalizedTours = computed(() => {
+  if (!booking.value) return [];
+  
+  // Handle all possible data structures
+  if (booking.value.tours) {
+    return booking.value.tours;
+  }
+  if (booking.value.township) {
+    return [{ 
+      name: booking.value.township,
+      date: booking.value.date 
+    }];
+  }
+  return [];
+});
+
+const isSingleTownship = computed(() => {
+  return booking.value?.packageId === 1 || 
+         (booking.value?.tours?.length === 1 && !isTownshipDuo.value && !isFullCapeCulture.value);
+});
+
+const isTownshipDuo = computed(() => {
+  return booking.value?.packageId === 2 || 
+         (booking.value?.tours?.length === 2 && booking.value?.packageName?.includes('Duo'));
+});
+
+const isFullCapeCulture = computed(() => {
+  return booking.value?.packageId === 3 || 
+         (booking.value?.tours?.length > 2 && booking.value?.packageName?.includes('Full'));
+});
 
 // Enhanced date formatting with timezone support
 const formatDate = (dateString) => {
@@ -155,42 +237,25 @@ const confettiStyle = (i) => {
   };
 };
 
-onMounted(async () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const sessionId = urlParams.get('session_id');
-
-  if (!sessionId) {
-    error.value = 'No session ID provided.';
-    loading.value = false;
-    return;
-  }
-
-  try {
-    const response = await fetch(`http://localhost:5000/api/payment-confirm?session_id=${sessionId}`);
-    const data = await response.json();
-
-    if (response.ok && data.booking) {
-      booking.value = {
-        ...data.booking,
-        // Ensure nested objects exist
-        Package: data.booking.Package || { packageName: 'Not specified' },
-        Customer: data.booking.Customer || { 
-          name: 'Not specified',
-          email: 'Not specified',
-          cell: 'Not specified'
-        },
-        Township: data.booking.Township || { townName: 'Not specified' }
-      };
-    } else {
-      error.value = data.error || 'Payment confirmation failed';
+onMounted(() => {
+  const stored = localStorage.getItem("bookingDetails");
+  if (stored) {
+    booking.value = JSON.parse(stored);
+    
+    // If bookingRef doesn't exist, fall back to bookingId or generate a simple one
+    if (!booking.value.bookingRef) {
+      booking.value.bookingRef = booking.value.bookingId || `temp-${Math.floor(100000 + Math.random() * 900000)}`;
     }
-  } catch (err) {
-    error.value = 'Failed to confirm payment. Please try again later.';
-    console.error('Error confirming payment:', err);
-  } finally {
-    loading.value = false;
+  } else {
+    error.value = "No booking details found.";
   }
+  loading.value = false;
 });
+
+
+const printConfirmation = () => {
+  window.print();
+};
 </script>
 
 <style scoped>

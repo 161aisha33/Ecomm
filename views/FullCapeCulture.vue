@@ -1,3 +1,4 @@
+
 <template>
   <div class="booking-form">
     <div class="form-header">
@@ -6,6 +7,7 @@
     </div>
     
     <div class="form-body">
+      <!-- Tour Selection Section -->
       <div class="form-group">
         <label for="people">Number of People:</label>
         <input 
@@ -14,7 +16,9 @@
           v-model.number="people" 
           min="1" 
           class="form-input"
+          @input="validatePeople"
         />
+        <span v-if="errors.people" class="error-message">{{ errors.people }}</span>
       </div>
 
       <div 
@@ -28,6 +32,7 @@
             :id="'township-'+index"
             v-model="town.name" 
             class="form-input"
+            @change="validateTownship(index)"
           >
             <option disabled value="">Choose township</option>
             <option 
@@ -39,6 +44,9 @@
               {{ option }}
             </option>
           </select>
+          <span v-if="errors[`township${index}`]" class="error-message">
+            {{ errors[`township${index}`] }}
+          </span>
         </div>
 
         <div class="form-group">
@@ -49,7 +57,11 @@
             v-model="town.date"
             :min="minDate"
             :class="['form-input', { 'input-error': hasDateConflict(index) }]"
+            @change="validateDate(index)"
           />
+          <span v-if="errors[`date${index}`]" class="error-message">
+            {{ errors[`date${index}`] }}
+          </span>
           <div v-if="hasDateConflict(index)" class="error-message">
             ⚠️ This date conflicts with another township
           </div>
@@ -72,8 +84,9 @@
         <div class="total-amount">R{{ total }}</div>
       </div>
 
-      <button @click="bookNow" class="book-btn">
-        <span>Book Now</span>
+      <button @click="validateTourDetails" class="book-btn" :disabled="loading">
+        <span v-if="!loading">Proceed to Details</span>
+        <span v-else>Processing...</span>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
           <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
         </svg>
@@ -96,6 +109,14 @@ export default {
       packageId: 3,
       packageName: "Full Cape Culture Tour",
       pricePerPerson: 6000,
+      loading: false,
+      errors: {
+        people: "",
+        township0: "",
+        township1: "",
+        date0: "",
+        date1: ""
+      }
     };
   },
   computed: {
@@ -106,28 +127,34 @@ export default {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       return tomorrow.toISOString().split("T")[0];
+    },
+    townshipIds() {
+      return this.selectedTownships.map(town => 
+        this.townships.indexOf(town.name) + 1
+      ).filter(id => id > 0);
+    },
+    hasFormErrors() {
+      return Object.values(this.errors).some(error => error !== "") ||
+             this.selectedTownships.some(t => !t.name || !t.date) ||
+             this.hasAnyDateConflict() ||
+             this.people < 1;
     }
   },
   methods: {
     availableTownships(index) {
-      // Return all townships except those selected in other fields
       return this.townships.filter(town => 
         !this.selectedTownships.some((t, i) => i !== index && t.name === town)
       );
     },
     isTownshipSelected(town, currentIndex) {
-      // Check if township is selected in any other field
       return this.selectedTownships.some((t, i) => 
         i !== currentIndex && t.name === town
       );
     },
     hasDateConflict(index) {
       if (!this.selectedTownships[index].date) return false;
-      
       return this.selectedTownships.some((t, i) => 
-        i !== index && 
-        t.date && 
-        t.date === this.selectedTownships[index].date
+        i !== index && t.date && t.date === this.selectedTownships[index].date
       );
     },
     hasAnyDateConflict() {
@@ -136,60 +163,61 @@ export default {
     addTownship() {
       if (this.selectedTownships.length < 4) {
         this.selectedTownships.push({ name: "", date: "" });
+        this.$set(this.errors, `township${this.selectedTownships.length-1}`, "");
+        this.$set(this.errors, `date${this.selectedTownships.length-1}`, "");
       }
     },
-    bookNow() {
-      // Validate all townships are selected
-      if (this.selectedTownships.some(t => !t.name)) {
-        alert("Please select a township for each entry.");
-        return;
-      }
-      
-      // Validate all dates are selected
-      if (this.selectedTownships.some(t => !t.date)) {
-        alert("Please select a date for each township.");
-        return;
-      }
-      
-      // Validate no duplicate townships
-      const townshipNames = this.selectedTownships.map(t => t.name);
-      if (new Set(townshipNames).size !== townshipNames.length) {
-        alert("Please select different townships for each entry.");
-        return;
-      }
-      
-      // Validate no duplicate dates
-      if (this.hasAnyDateConflict()) {
-        alert("Please select different dates for each township.");
-        return;
-      }
-      
-      // Validate dates are in the future
-      const today = new Date().toISOString().split('T')[0];
-      if (this.selectedTownships.some(t => t.date < today)) {
-        alert("Please select future dates for all townships.");
-        return;
-      }
-      
-      // Validate people count
+    validatePeople() {
       if (this.people < 1) {
-        alert("Please enter a valid number of people.");
+        this.errors.people = "At least 1 person required";
+      } else {
+        this.errors.people = "";
+      }
+    },
+    validateTownship(index) {
+      if (!this.selectedTownships[index].name) {
+        this.errors[`township${index}`] = "Please select a township";
+      } else {
+        this.errors[`township${index}`] = "";
+      }
+    },
+    validateDate(index) {
+      if (!this.selectedTownships[index].date) {
+        this.errors[`date${index}`] = "Please select a date";
+      } else if (new Date(this.selectedTownships[index].date) < new Date(this.minDate)) {
+        this.errors[`date${index}`] = "Please select a future date";
+      } else {
+        this.errors[`date${index}`] = "";
+      }
+    },
+    validateTourDetails() {
+      // Validate all fields
+      this.validatePeople();
+      this.selectedTownships.forEach((_, index) => {
+        this.validateTownship(index);
+        this.validateDate(index);
+      });
+
+      if (this.hasFormErrors) {
+        alert("Please correct the errors in the form");
         return;
       }
 
-      const bookingDetails = {
+      // Save tour details and proceed to customer info
+      const tourDetails = {
         packageId: this.packageId,
         packageName: this.packageName,
         people: this.people,
-        townships: this.selectedTownships.map(t => ({
+        total: this.total,
+        tours: this.selectedTownships.map(t => ({
           name: t.name,
           date: t.date
         })),
-        total: this.total
+        townshipIds: this.townshipIds
       };
 
-      localStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
-      this.$router.push("/register");
+      localStorage.setItem('bookingDetails', JSON.stringify(tourDetails));
+      this.$router.push('/register'); // Go to customer details form
     }
   }
 };

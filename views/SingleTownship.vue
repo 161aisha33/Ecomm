@@ -14,7 +14,9 @@
           v-model.number="people" 
           min="1" 
           class="form-input"
+          @input="validatePeople"
         />
+        <span v-if="errors.people" class="error-message">{{ errors.people }}</span>
       </div>
 
       <div class="form-group">
@@ -23,10 +25,12 @@
           id="township" 
           v-model="selectedTownship" 
           class="form-input"
+          @change="validateTownship"
         >
           <option disabled value="">Choose township</option>
           <option v-for="town in townships" :key="town" :value="town">{{ town }}</option>
         </select>
+        <span v-if="errors.township" class="error-message">{{ errors.township }}</span>
       </div>
 
       <div class="form-group">
@@ -37,7 +41,9 @@
           v-model="date"
           :min="minDate"
           class="form-input"
+          @change="validateDate"
         />
+        <span v-if="errors.date" class="error-message">{{ errors.date }}</span>
       </div>
 
       <div class="summary">
@@ -45,8 +51,9 @@
         <div class="total-amount">R{{ total }}</div>
       </div>
 
-      <button @click="bookNow" class="book-btn">
-        <span>Book Now</span>
+      <button @click="validateTourDetails" class="book-btn" :disabled="loading">
+        <span v-if="!loading">Proceed to Details</span>
+        <span v-else>Processing...</span>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
           <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
         </svg>
@@ -58,15 +65,21 @@
 <script>
 export default {
   name: "SingleTownship",
-   data() {
+  data() {
     return {
       people: 1,
-      selectedTownship: this.$route.query.presetTownship || "", // Auto-set from URL
+      selectedTownship: this.$route.query.presetTownship || "",
       date: "",
       townships: ["Bo-Kaap", "Khayelitsha", "Mitchells Plain", "Langa"],
       packageId: 1,
       packageName: "Single Township Tour",
       pricePerPerson: 1500,
+      loading: false,
+      errors: {
+        people: "",
+        township: "",
+        date: ""
+      }
     };
   },
   computed: {
@@ -77,33 +90,67 @@ export default {
     },
     total() {
       return this.people * this.pricePerPerson;
+    },
+    hasFormErrors() {
+      return Object.values(this.errors).some(error => error !== "") || 
+             !this.selectedTownship || 
+             !this.date || 
+             this.people < 1;
     }
   },
   methods: {
-    bookNow() {
-      if (!this.selectedTownship || !this.date || this.people < 1) {
-        alert("Please fill all fields correctly.");
-        return;
+    validatePeople() {
+      if (this.people < 1) {
+        this.errors.people = "At least 1 person required";
+      } else {
+        this.errors.people = "";
       }
-      if (this.date < this.minDate) {
-        alert("Please select a date from tomorrow onwards.");
-        return;
-      }
-
-      const bookingDetails = {
-        packageId: this.packageId,
-        packageName: this.packageName,
-        people: this.people,
-        township: this.selectedTownship,
-        date: this.date,
-        total: this.total,
-      };
-
-      localStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
-      this.$router.push("/register");
     },
-  },
-};
+    validateTownship() {
+      if (!this.selectedTownship) {
+        this.errors.township = "Please select a township";
+      } else {
+        this.errors.township = "";
+      }
+    },
+    validateDate() {
+      if (!this.date) {
+        this.errors.date = "Please select a date";
+      } else if (new Date(this.date) < new Date(this.minDate)) {
+        this.errors.date = "Please select a future date";
+      } else {
+        this.errors.date = "";
+      }
+    },
+    validateTourDetails() {
+      // Validate all fields
+      this.validatePeople();
+      this.validateTownship();
+      this.validateDate();
+
+      if (this.hasFormErrors) {
+        alert("Please correct the errors in the form");
+        return;
+      }
+
+      // Save tour details and proceed to customer info
+ const tourDetails = {
+    packageId: this.packageId,  // Make sure this is 1 for Single Township
+    packageName: this.packageName,
+    people: this.people,
+    total: this.total,
+    tours: [
+      {
+        township: this.selectedTownship,
+        date: this.date
+      }
+    ],
+    bookingType: 'single'  // Explicit type identifier
+  };
+
+  localStorage.setItem('bookingDetails', JSON.stringify(tourDetails));
+  this.$router.push('/register');
+}}}
 </script>
 
 <style scoped>

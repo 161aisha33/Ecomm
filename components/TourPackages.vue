@@ -1,30 +1,44 @@
 <template>
   <div class="tours-container">
-    <button class="close-button" @click="$emit('close')">×</button>
-    <h1>Our Packages for {{ selectedTour.name }}</h1>
+    <!-- Close Button -->
+    <button class="close-button" @click.stop="handleClose">×</button>
+
+    <!-- Header -->
+    <h1 v-if="selectedTour">Our Packages for {{ selectedTour.name }}</h1>
+    <h1 v-else>Our Packages</h1>
     
+    <!-- Packages -->
     <div class="package-cards-container">
       <div class="package-cards">
         <div 
           class="package-card" 
           v-for="pkg in packages" 
           :key="pkg.id"
-          @click="selectPackage(pkg)"
         >
-        <div class="package-icon">
-          <span v-if="pkg.id === 'single'">🏘️</span>
-          <span v-else-if="pkg.id === 'duo'">🏘️🏘️</span>
-          <span v-else>🌍</span>
+          <!-- Icon -->
+          <div class="package-icon">
+            <span v-if="pkg.id === 'single'">🏘️</span>
+            <span v-else-if="pkg.id === 'duo'">🏘️🏘️</span>
+            <span v-else>🌍</span>
+          </div>
+
+          <!-- Title -->
+          <h2>{{ pkg.title }}</h2>
+
+          <!-- Description -->
+          <p class="package-description">
+            {{ getPackageDescription(pkg.id) }}
+          </p>
+
+          <!-- Select Button -->
+          <button 
+            class="select-btn"
+            @click.stop="selectPackage(pkg)"
+          >
+            Select Package
+          </button>
         </div>
-        <h2>{{ pkg.title }}</h2>
-        <p class="package-description">
-          {{ getPackageDescription(pkg.id) }}
-        </p>
-        <button class="select-btn">
-          Select Package
-        </button>
       </div>
-    </div>
     </div>
   </div>
 </template>
@@ -35,7 +49,7 @@ export default {
   props: {
     selectedTour: {
       type: Object,
-      required: true
+      default: () => ({ name: 'Selected Tour' })
     }
   },
   data() {
@@ -49,19 +63,25 @@ export default {
   },
   methods: {
     selectPackage(pkg) {
-      this.$emit('package-selected', pkg)
+      // Emit package-selected event with the package object
+      this.$emit('package-selected', pkg);
     },
     getPackageDescription(id) {
       const descriptions = {
         single: 'Immerse yourself in one vibrant township community',
         duo: 'Experience two distinct townships in one day',
         full: 'The complete Cape Town cultural experience'
-      }
-      return descriptions[id] || ''
+      };
+      return descriptions[id] || '';
+    },
+    handleClose() {
+      // Instead of only emitting close, navigate to tours page
+      this.$router.push("/tours");
     }
   }
 }
 </script>
+
 
 <style scoped>
 .tours-container {
@@ -72,7 +92,6 @@ export default {
   display: flex;
   flex-direction: column;
 }
-
 
 .close-button {
   position: absolute;
@@ -90,6 +109,7 @@ export default {
   justify-content: center;
   border-radius: 50%;
   transition: all 0.3s ease;
+  z-index: 10;
 }
 
 .close-button:hover {
@@ -104,7 +124,6 @@ h1 {
   color: #091d35;
   padding: 0 1rem;
 }
-
 
 .package-cards {
   flex: 1;
@@ -166,5 +185,4 @@ h1 {
   background-color: #f6c46d;
   color: #091d35;
 }
-
 </style>

@@ -55,12 +55,10 @@
   </div>
 </div>
  
-<SiteFooter />
   </div>
 </template>
 
 <script>
-import SiteFooter from '@/components/SiteFooter.vue';
 
 export default {
   data() {
@@ -97,9 +95,6 @@ export default {
 
     };
   },name: 'HomeView',
-  components: {
-    SiteFooter
-  },
   mounted() {
     setInterval(() => {
       if (this.images && this.images.length > 0) {

@@ -122,49 +122,48 @@ export default {
     }
   },
   methods: {
-    bookNow() {
-      // Validation
-      if (!this.township1 || !this.township2 || !this.date1 || !this.date2) {
-        alert("Please select both townships and dates.");
-        return;
-      }
-      
-      if (this.township1 === this.township2) {
-        alert("Please select two different townships.");
-        return;
-      }
-      
-      if (this.dateConflict) {
-        alert("The two tour dates must be different.");
-        return;
-      }
-      
-      if (new Date(this.date1) < new Date(this.minDate) ){
-        alert("First tour date must be in the future.");
-        return;
-      }
-      
-      if (new Date(this.date2) < new Date(this.minDate)) {
-        alert("Second tour date must be in the future.");
-        return;
-      }
+  bookNow() {
+    // Validation
+    if (!this.township1 || !this.township2 || !this.date1 || !this.date2) {
+      alert("Please select both townships and dates.");
+      return;
+    }
+    
+    if (this.township1 === this.township2) {
+      alert("Please select two different townships.");
+      return;
+    }
+    
+    if (this.date1 === this.date2) {
+      alert("The two tour dates must be different.");
+      return;
+    }
+    
+    if (new Date(this.date1) < new Date(this.minDate)) {
+      alert("First tour date must be in the future.");
+      return;
+    }
+    
+    if (new Date(this.date2) < new Date(this.minDate)) {
+      alert("Second tour date must be in the future.");
+      return;
+    }
 
-      const bookingDetails = {
-        packageId: this.packageId,
-        packageName: this.packageName,
-        people: this.people,
-        township1: this.township1,
-        date1: this.date1,
-        township2: this.township2,
-        date2: this.date2,
-        total: this.total,
-      };
+     const bookingDetails = {
+    packageId: this.packageId,
+    packageName: this.packageName,
+    people: this.people,
+    total: this.total,
+    tours: [
+      { township: this.township1, date: this.date1 },
+      { township: this.township2, date: this.date2 }
+    ]
+  };
 
-      localStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
-      this.$router.push("/register");
-    },
-  },
-};
+  localStorage.setItem("bookingDetails", JSON.stringify(bookingDetails));
+  this.$router.push("/register");
+}
+}}
 </script>
 
 <style scoped>

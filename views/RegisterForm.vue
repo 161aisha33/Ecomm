@@ -12,7 +12,9 @@
           placeholder="First Name" 
           required 
           class="form-input"
+          @input="validateName('firstName')"
         />
+        <span v-if="errors.firstName" class="error-message">{{ errors.firstName }}</span>
       </div>
 
       <div class="form-group">
@@ -21,7 +23,9 @@
           placeholder="Last Name" 
           required 
           class="form-input"
+          @input="validateName('lastName')"
         />
+        <span v-if="errors.lastName" class="error-message">{{ errors.lastName }}</span>
       </div>
 
       <div class="form-group">
@@ -31,7 +35,9 @@
           placeholder="Email" 
           required 
           class="form-input"
+          @input="validateEmail"
         />
+        <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
       </div>
 
       <div class="form-group">
@@ -41,10 +47,12 @@
           placeholder="Phone Number" 
           required 
           class="form-input"
+          @input="validatePhone"
         />
+        <span v-if="errors.phone" class="error-message">{{ errors.phone }}</span>
       </div>
 
-      <button :disabled="loading" class="submit-btn">
+      <button :disabled="loading || hasErrors" class="submit-btn">
         <span v-if="!loading">Proceed to Payment</span>
         <span v-else>Processing...</span>
         <svg v-if="!loading" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -61,7 +69,7 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -74,43 +82,125 @@ const form = reactive({
   phone: '',
 })
 
+const errors = reactive({
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: ''
+})
+
+const validateName = (field) => {
+  const value = form[field].trim()
+  if (!value) {
+    errors[field] = 'This field is required'
+  } else if (!/^[A-Za-z\s-]+$/.test(value)) {
+    errors[field] = 'Only letters, spaces and hyphens allowed'
+  } else {
+    errors[field] = ''
+  }
+}
+
+const validateEmail = () => {
+  const email = form.email.trim()
+  if (!email) {
+    errors.email = 'Email is required'
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.email = 'Please enter a valid email'
+  } else {
+    errors.email = ''
+  }
+}
+
+const validatePhone = () => {
+  const phone = form.phone.trim()
+  if (!phone) {
+    errors.phone = 'Phone number is required'
+  } else if (!/^[\d\s+-]+$/.test(phone)) {
+    errors.phone = 'Only numbers, spaces, + and - allowed'
+  } else {
+    errors.phone = ''
+  }
+}
+
+const hasErrors = computed(() => {
+  return Object.values(errors).some(error => error !== '') ||
+         Object.values(form).some(field => !field.trim())
+})
+
 const submitForm = async () => {
+  // Validate all fields before submission
+  validateName('firstName')
+  validateName('lastName')
+  validateEmail()
+  validatePhone()
+
+  if (hasErrors.value) {
+    alert('Please correct the errors in the form')
+    return
+  }
+
   loading.value = true
 
   try {
     const bookingDetails = JSON.parse(localStorage.getItem('bookingDetails'))
     if (!bookingDetails) {
-      alert('No booking found. Please book a tour first.')
-      loading.value = false
-      router.push('/')
-      return
+      throw new Error('No booking found. Please book a tour first.')
     }
 
-    // Prepare payload to backend
+    // Normalize townships data for different package types
+    const townships = bookingDetails.tours || 
+                     bookingDetails.townships || 
+                     (bookingDetails.township ? [{ name: bookingDetails.township }] : [])
+
+    // Normalize dates data
+    const dates = bookingDetails.tours?.map(t => t.date) || 
+                 bookingDetails.townships?.map(t => t.date) || 
+                 (bookingDetails.date ? [bookingDetails.date] : [])
+
     const payload = {
-      full_name: `${form.firstName} ${form.lastName}`,
-      email: form.email,
-      phone: form.phone,
+      full_name: `${form.firstName.trim()} ${form.lastName.trim()}`,
+      email: form.email.trim(),
+      phone: form.phone.trim(),
       packageId: bookingDetails.packageId,
       number_of_people: bookingDetails.people,
-      townships: bookingDetails.townships || [bookingDetails.township || bookingDetails.firstTownship || bookingDetails.firstTownship], 
-      dates: bookingDetails.dates || [bookingDetails.date || bookingDetails.firstDate || bookingDetails.date],
+      townships: townships.map(t => t.name || t.township),
+      dates: dates,
+      totalPrice: bookingDetails.total
     }
 
-    const res = await fetch('http://localhost:5000/api/bookings', {
+    const response = await fetch('http://localhost:5000/api/bookings', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      headers: { 
+        'Content-Type': 'application/json',
+        // Add authorization header if needed
+        // 'Authorization': `Bearer ${yourAuthToken}`
+      },
+      body: JSON.stringify(payload)
     })
 
-    const data = await res.json()
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Booking failed')
+    }
 
-    if (!res.ok) throw new Error(data.error || 'Booking failed')
-
-    localStorage.setItem('checkoutUrl', data.checkoutUrl)
+    const data = await response.json()
+    
+    // Store the checkout URL and booking reference
+    localStorage.setItem('checkoutData', JSON.stringify({
+      checkoutUrl: data.checkoutUrl,
+      bookingRef: data.bookingRef
+    }))
+    
+    // Redirect to Stripe checkout
     window.location.href = data.checkoutUrl
-  } catch (err) {
-    alert(err.message)
+
+  } catch (error) {
+    console.error('Booking error:', error)
+    alert(error.message || 'An error occurred during booking')
+    // Fallback to local storage if API fails
+    if (error.message.includes('No booking found')) {
+      router.push('/')
+    }
   } finally {
     loading.value = false
   }
@@ -231,5 +321,11 @@ const submitForm = async () => {
   .form-header, .form-body {
     padding: 20px;
   }
+}
+.error-message {
+  color: #ff4444;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: block;
 }
 </style>
